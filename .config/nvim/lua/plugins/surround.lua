@@ -2,7 +2,7 @@ return {
   "kylechui/nvim-surround",
   enabled = true,
   event = { "BufReadPre", "BufNewFile" },
-  version = "*", -- Use for stability; omit to use `main` branch for the latest features
+  version = "*",
   config = function()
     require("nvim-surround").setup({
       -- keymaps = {
@@ -16,7 +16,7 @@ return {
       --   change = "<leader>SC",          -- Change surround
       -- }
       keymaps = Phonon.surroundKeys
-      -- Other configurations remain the same
+
     })
   end,
 }
