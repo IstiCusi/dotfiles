@@ -1,8 +1,10 @@
 # Dotfiles
+
 My personal configuration files for:
 
-- NvChad (Neovim)
+- Neovim (self made config)
 - Emacs
+- Zsh
 
 ## Installation:
 
