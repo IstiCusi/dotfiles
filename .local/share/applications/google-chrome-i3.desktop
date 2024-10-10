@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Google I3 Chrom
+Exec=google-chrome --password-store=gnome-libsecret
+Terminal=false
+Type=Application
+Icon=google-chrome
+Categories=Network;WebBrowser;
+StartupNotify=false
+
