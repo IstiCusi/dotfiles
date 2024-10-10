@@ -10,12 +10,23 @@ Phonon.keygroups = {}
 --- Set Leader Key ------------------------------------------------------------
 g.mapleader = " "
 
--- Exit Neovim without saving
+-- Exit Neovim without saving -------------------------------------------------
 
 vim.api.nvim_set_keymap("n", "ZX", "ZQ", { noremap = true, silent = true })
 
---- Close Window and Buffer
+--- Close Window and Buffer ---------------------------------------------------
 map("n", "<C-c>", "<cmd>bd<CR>", { desc = "Close window and buffer" })
+map("t", "<C-c>", "<cmd>bd!<CR>", { desc = "Close window and buffer" })
+
+--- Open nvim internal terminal ----------------------------------------------
+map("n", "<leader>tt", ":terminal<CR>", { noremap = true, silent = true, desc = "Terminal" })
+--- TODO: C-c to close terminal in all cases (normal and insert mode)
+
+-- Leaping -------------------------------------------------------------------
+map({ "n", "x", "o" }, "<leader><leader>", "<Plug>(leap)", { desc = "Leap" })
+
+-- Clean buffer without changing clipboard -----------------------------------
+vim.api.nvim_set_keymap("n", "<leader>GG", 'gg"_dG', { noremap = true, silent = true })
 
 -- Split Maximer -------------------------------------------------------------
 Phonon.maximizerKeys = { "<leader>mm", "<cmd>MaximizerToggle<CR>", desc = "Maximize/minimize a split" }
@@ -265,8 +276,9 @@ map("n", "<Leader>otp", "<Plug>(neorg.qol.todo-items.todo.task-pending)", { nore
 map("n", "<Leader>otr", "<Plug>(neorg.qol.todo-items.todo.task-recurring)", { noremap = true, silent = true })
 map("n", "<Leader>otu", "<Plug>(neorg.qol.todo-items.todo.task-undone)", { noremap = true, silent = true })
 
+map("n", "<leader>op", ':lua require("nabla").popup({border = "single"})<CR>', { desc = "Nabla" })
+map("n", "<leader>or", ':lua require("nabla").toggle_virt()<CR>', { desc = "Nabla toggle" })
 -- Easy Align -----------------------------------------------------------------
 
 map("x", "ga", "<Plug>(EasyAlign)", { noremap = false, silent = true, desc = "Easy Align" })
 map("n", "ga", "<Plug>(EasyAlign)", { noremap = false, silent = true, desc = "Easy Align" })
-
