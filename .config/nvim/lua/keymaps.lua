@@ -11,7 +11,6 @@ Phonon.keygroups = {}
 g.mapleader = " "
 
 -- Exit Neovim without saving -------------------------------------------------
-
 vim.api.nvim_set_keymap("n", "ZX", "ZQ", { noremap = true, silent = true })
 
 --- Close Window and Buffer ---------------------------------------------------
@@ -23,12 +22,15 @@ map("n", "<leader>tt", ":terminal<CR>", { noremap = true, silent = true, desc = 
 --- TODO: C-c to close terminal in all cases (normal and insert mode)
 
 -- Leaping -------------------------------------------------------------------
-map({ "n", "x", "o" }, "<leader><leader>", "<Plug>(leap)", { desc = "Leap" })
+table.insert(Phonon.keygroups, { "<leader><leader>", desc = "Leap", icon = "🦘" })
+map({ "n", "x", "o" }, "<leader><leader>", "<Plug>(leap)", { desc = "Leap"  })
 
 -- Clean buffer without changing clipboard -----------------------------------
+table.insert(Phonon.keygroups, { "<leader>G", desc = "Empty Buffer", icon = "🗑️" })
 vim.api.nvim_set_keymap("n", "<leader>GG", 'gg"_dG', { noremap = true, silent = true })
 
 -- Split Maximer -------------------------------------------------------------
+table.insert(Phonon.keygroups, { "<leader>m", desc = "Maximize/minimize a split", icon = "🔳" })
 Phonon.maximizerKeys = { "<leader>mm", "<cmd>MaximizerToggle<CR>", desc = "Maximize/minimize a split" }
 
 --- Set Standard ESC Variants And Other Exit Variants ------------------------
@@ -45,7 +47,7 @@ map("n", "<S-Tab>", "<cmd>tabp<CR>", { desc = "Jump to previous tab" })
 map("n", "<Tab>", "<cmd>tabn<CR>", { desc = "Jump to next tab" })
 
 --- Telescope and search bindings -------------------------------------------------------
-table.insert(Phonon.keygroups, { "<leader>f", "Telescope", desc = "Telescope" })
+table.insert(Phonon.keygroups, { "<leader>f", desc = "Telescope" })
 function Phonon.telescopeKeys()
 	local keymap = vim.keymap
 	keymap.set("n", "<leader>ff", "<cmd>Telescope find_files<cr>", { desc = "Fuzzy find files in cwd" })
@@ -53,22 +55,48 @@ function Phonon.telescopeKeys()
 	keymap.set("n", "<leader>fs", "<cmd>Telescope live_grep<cr>", { desc = "Find string in cwd" })
 	keymap.set("n", "<leader>fc", "<cmd>Telescope grep_string<cr>", { desc = "Find string under cursor in cwd" })
 	keymap.set("n", "<leader>ft", "<cmd>TodoTelescope<cr>", { desc = "Find todos" })
-	keymap.set(
-		"n",
-		"<leader>fi",
-		':lua require("modules.lookup_includes").search_standard_includes()<CR>',
-		{ desc = "Search Includes" }
-	)
+	keymap.set( "n", "<leader>fi", ':lua require("modules.lookup_includes").search_standard_includes()<CR>', { desc = "Search Includes" })
 end
 
-vim.api.nvim_set_keymap("n", "<leader>fm", ":lua SearchManPageForCurrentWord()<CR>", { noremap = true })
+
+vim.api.nvim_set_keymap("n", "<leader>fm", ":lua SearchManPageForCurrentWord()<CR>", { noremap = true , desc ="Search Man Pages"})
 function SearchManPageForCurrentWord()
-	local word = vim.fn.expand("<cword>")
-	vim.cmd("Man " .. word)
+    local filetype = vim.bo.filetype
+    if filetype ~= "c" and filetype ~= "cpp" then
+        print("No C/C++ file detected. Aborting.")
+        return
+    end
+
+    local word = vim.fn.expand("<cword>")
+    if word == "" then
+        print("No word under cursor. Aborting.")
+        return
+    end
+
+    local sections = { "2", "3" }
+    local found = false
+
+    for _, section in ipairs(sections) do
+        local status, _ = pcall(function()
+            vim.cmd("Man " .. section .. " " .. word)
+        end)
+
+        if status then
+            found = true
+            break
+        end
+    end
+
+    if not found then
+        print("No relevant C/C++ manpage found for: " .. word)
+    end
 end
+
+
+
 
 --- Open New Tabs ------------------------------------------------------------
-table.insert(Phonon.keygroups, { "<leader>t", "Tabs", desc = "Tabs" })
+table.insert(Phonon.keygroups, { "<leader>t", desc = "Tabs" })
 map("n", "<leader>to", "<cmd>tabnew<CR>", { desc = "Open new tab" })
 map("n", "<leader>tc", "<cmd>tabclose<CR>", { desc = "Close current tab" })
 map("n", "<leader>tf", function()
@@ -89,6 +117,7 @@ function OilOpen()
 	vim.cmd("split | wincmd j")
 	require("oil").open()
 end
+table.insert(Phonon.keygroups, { "<leader>-", desc = "Open Oil As Split", icon="🛢️" })
 
 map("n", "-", "<cmd>Oil<CR>", { desc = "Open Oil" })
 map("n", "<leader>-", OilOpen, { desc = "Open Oil As Split" })
@@ -113,8 +142,8 @@ Phonon.oilKeys = {
 }
 
 --- Nvim File Explorer ------------------------------------------------------
-table.insert(Phonon.keygroups, { "<leader>e", "Explorer", desc = "Explorer" })
-map("n", "<C-n>", "<cmd>NvimTreeToggle<CR>", { desc = "Toggle file explorer" })
+table.insert(Phonon.keygroups, { "<leader>e" , desc = "Explorer", icon ="📂" })
+-- map("n", "<C-n>", "<cmd>NvimTreeToggle<CR>", { desc = "Toggle file explorer" })
 map("n", "<leader>ee", "<cmd>NvimTreeToggle<CR>", { desc = "Toggle file explorer" })
 
 function Phonon.nvimTreeKeys(bufnr)
@@ -128,7 +157,7 @@ function Phonon.nvimTreeKeys(bufnr)
 end
 
 -- Auto Session Keys --------------------------------------------------------
-table.insert(Phonon.keygroups, { "<leader>w", "Session", desc = "Session" })
+table.insert(Phonon.keygroups, { "<leader>w", desc = "Session", icon = "💾" })
 function Phonon.autoSession()
 	local keymap = vim.keymap
 	keymap.set("n", "<leader>wr", "<cmd>SessionRestore<CR>", { desc = "Restore session for cwd" })
@@ -146,7 +175,7 @@ Phonon.treesitterSelection = {
 
 -- Special keys for programming ---------------------------------------------
 
-table.insert(Phonon.keygroups, { "<leader>s", "Subtitute", desc = "Substitute" })
+table.insert(Phonon.keygroups, { "<leader>s", desc = "Substitute", icon ="🪚"})
 function Phonon.substituteKeys()
 	local keymap = vim.keymap
 	local substitute = require("substitute")
@@ -156,7 +185,8 @@ function Phonon.substituteKeys()
 end
 
 -- Other convinient mappings -------------------------------------------------
-table.insert(Phonon.keygroups, { "<leader>n", "Switch On/Off", desc = "Switch On/Off", icon = "⏻" })
+-- table.insert(Phonon.keygroups, { "<leader>n", "Switch On/Off", desc = "Switch On/Off", icon = "⏻" })
+table.insert(Phonon.keygroups, { "<leader>n", desc = "Switch On/Off", icon = "⏻" })
 map("n", "<leader>nl", ":IBLToggle<CR>", { desc = "Switch on/off indent lines" })
 map("n", "<leader>nh", ":lua ToggleHlsearch()<CR>", { desc = "Switch on/off highlight" })
 map("n", "<leader>nn", 'f"i\\n<ESC>', { desc = "Add \\n" }) -- addes \n in c to string
@@ -175,7 +205,7 @@ function ToggleHlsearch()
 end
 
 -- Surround Keys --------------------------------------------------------------
-table.insert(Phonon.keygroups, { "<leader>S", "Surround", desc = "Surround" })
+table.insert(Phonon.keygroups, { "<leader>S", desc = "Surround", icon = "🌀" })
 Phonon.surroundKeys = {
 	insert = false, -- unset, because too slow input mode
 	insert_line = false, -- unset because too slow input mode
@@ -188,7 +218,7 @@ Phonon.surroundKeys = {
 }
 
 -- trouble keys ----------------------------------------------------------------
-table.insert(Phonon.keygroups, { "<leader>x", "trouble", desc = "trouble", icon = "⚠️" })
+table.insert(Phonon.keygroups, { "<leader>x", desc = "trouble", icon = "⚠️" })
 Phonon.troublekeys = {
 	{ "<leader>xw", "<cmd>trouble diagnostics toggle<cr>", desc = "open trouble workspace diagnostics" },
 	{ "<leader>xd", "<cmd>trouble diagnostics toggle filter.buf=0<cr>", desc = "open trouble document diagnostics" },
@@ -202,11 +232,19 @@ Phonon.troublekeys = {
 map("n", "dc", ':lua require("modules.delete-comment").delete_comment()<cr>', { desc = "delete comment" })
 
 -- correct with the lsp server -------------------------------------------------
-table.insert(Phonon.keygroups, { "<leader>c", "correct", desc = "correct" })
-table.insert(Phonon.keygroups, { "<leader>r", "refactoring", desc = "refactoring" })
+table.insert(Phonon.keygroups, { "<leader>c", desc = "Correct", icon ="🩹" })
+table.insert(Phonon.keygroups, { "<leader>r", desc = "Refactoring", icon="🔨" })
+
+-- Go for symbol actions -------------------------------------------------------
+
+table.insert(Phonon.keygroups, { "gr", desc = "LSP Symbol Actions", icon = "🔍" })
+table.insert(Phonon.keygroups, { "gra", desc = "Code Action", icon = "🛠️" })
+table.insert(Phonon.keygroups, { "gri", desc = "Go to Implementation", icon = "🚀" })
+table.insert(Phonon.keygroups, { "grn", desc = "Rename Symbol", icon = "✏️" })
+table.insert(Phonon.keygroups, { "grr", desc = "Find References", icon = "🔗" })
 
 -- git -------------------------------------------------------------------------
-table.insert(Phonon.keygroups, { "<leader>h", "git", desc = "git" })
+table.insert(Phonon.keygroups, { "<leader>h",  desc = "git", icon ="🌱" })
 
 function Phonon.gitKeys(bufnr)
 	local gs = package.loaded.gitsigns
@@ -256,12 +294,31 @@ end, { desc = "Format file or range (in visual mode)" })
 
 map("n", "<A-d>", "<Plug>(VM-Find-Under)", { noremap = true, silent = true, desc = "MultiCursor - Start Find Under" })
 Phonon.VM_maps = {
-	["Skip Region"] = "<A-s>",
-	["Start Regex Search"] = "<A-r>",
+	["Find Under"] = "<A-d>", -- Sucht das aktuelle Wort
+	["Find Subword Under"] = "<A-d>", -- Sucht Subwort im visuellen Modus
 }
 
+-- Phonon.VM_maps = {
+-- 	["Find Under"] = "<C-n>", -- Findet das aktuelle Wort unter dem Cursor
+-- 	["Find Subword Under"] = "<C-n>", -- Findet das Subwort, speziell im Visual-Modus
+--
+-- 	["Add Cursor Down"] = "<C-Down>", -- Fügt Cursor nach unten hinzu
+-- 	["Add Cursor Up"] = "<C-Up>", -- Fügt Cursor nach oben hinzu
+-- 	["Select All"] = "\\A", -- Wählt alle Vorkommen des Wortes im Dokument
+-- 	["Start Regex Search"] = "\\/", -- Startet eine Regex-Suche für Auswahl
+--
+-- 	["Switch Mode"] = "<Tab>", -- Wechselt zwischen Cursor- und Erweiterungsmodus
+-- 	["Goto Next"] = "]", -- Springt zum nächsten ausgewählten Bereich
+-- 	["Goto Prev"] = "[", -- Springt zum vorherigen ausgewählten Bereich
+-- 	["Seek Next"] = "<C-f>", -- Springt schnell zur nächsten Auswahl
+-- 	["Seek Prev"] = "<C-b>", -- Springt schnell zur vorherigen Auswahl
+--
+-- 	["Remove Region"] = "Q", -- Entfernt die aktuelle Region
+-- 	["Skip Region"] = "q", -- Überspringt die aktuelle Region
+-- }
+
 -- Nvorg Mode ----------------------------------------------------------------
-table.insert(Phonon.keygroups, { "<leader>o", "neorg", desc = "neorg" })
+table.insert(Phonon.keygroups, { "<leader>o", "neorg", desc = "neorg", icon ="🗒️" })
 map("n", "<Leader>oc", "<Plug>(neorg.qol.todo-items.todo.task-cycle)", { noremap = true, silent = true })
 map("n", "<Leader>om", "<Plug>(neorg.looking-glass.magnify-code-block)", { noremap = true, silent = true })
 map("n", "<Leader>od", "<Plug>(neorg.tempus.insert-date)", { noremap = true, silent = true })
@@ -278,7 +335,43 @@ map("n", "<Leader>otu", "<Plug>(neorg.qol.todo-items.todo.task-undone)", { norem
 
 map("n", "<leader>op", ':lua require("nabla").popup({border = "single"})<CR>', { desc = "Nabla" })
 map("n", "<leader>or", ':lua require("nabla").toggle_virt()<CR>', { desc = "Nabla toggle" })
+
 -- Easy Align -----------------------------------------------------------------
 
+table.insert(Phonon.keygroups, { "ga", icon = "📏" })
 map("x", "ga", "<Plug>(EasyAlign)", { noremap = false, silent = true, desc = "Easy Align" })
 map("n", "ga", "<Plug>(EasyAlign)", { noremap = false, silent = true, desc = "Easy Align" })
+
+-- Copilot --------------------------------------------------------------------
+function ToggleCopilot()
+	-- Check the current status by invoking Copilot's status command
+	local copilot_status = vim.g.copilot_enabled -- This tracks if Copilot is currently enabled
+
+	if copilot_status then
+		-- If enabled, disable Copilot
+		vim.cmd("Copilot disable")
+		vim.g.copilot_enabled = false
+		print("Copilot disabled")
+	else
+		-- If disabled, enable Copilot
+		vim.cmd("Copilot enable")
+		vim.g.copilot_enabled = true
+		print("Copilot enabled")
+	end
+end
+
+-- Assign the toggle function to a keybinding
+vim.api.nvim_set_keymap(
+	"n",
+	"<leader>cp",
+	":lua ToggleCopilot()<CR>",
+	{ desc = "Toggle CoPilot", noremap = true, silent = true }
+)
+
+-- Printing -----------------------------------------------------------------
+--
+vim.api.nvim_set_keymap("n", "<leader>np", ":lua print_with_minted()<CR>", { desc = "Print file" })
+
+Phonon.venvKeys = {
+	{ "<leader>nv", "<cmd>VenvSelect<cr>", desc = "Choose Python variant" },
+}

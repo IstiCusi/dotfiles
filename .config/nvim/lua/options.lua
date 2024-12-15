@@ -1,9 +1,15 @@
---- ============================Pure neovim/vim settings ===================== 
+--- ============================Pure neovim/vim settings =====================
 
 ---  ----------------------------- Local Alias -------------------------------
 local opt = vim.opt
-local g   = vim.g
+local g = vim.g
 ---  --------------------------------------------------------------------------
+
+-- Get the global pyenv Python version
+local pyenv_global_python = vim.fn.system("pyenv global"):gsub("%s+", "")
+
+-- Set the Python3 host program for Neovim (not for the editor)
+g.python3_host_prog = pyenv_global_python
 
 --- Switch off not functioning providers
 g.loaded_perl_provider = 0
@@ -14,48 +20,75 @@ opt.clipboard:append("unnamedplus")
 --- Keys Handling In Terminal
 opt.backspace = "indent,eol,start"
 
---- Color Scheme 
+--- Color Scheme
 vim.cmd("colorscheme tokyonight")
 
 --- Color Settings For Terminal
-opt.termguicolors = true    --- Use correct terminal colors
-opt.background = "dark"     --- Use always the dark version of a scheme
+opt.termguicolors = true --- Use correct terminal colors
+opt.background = "dark" --- Use always the dark version of a scheme
+
+--- Zsh Settings For Terminal
+
+--- TODO
 
 ---  Explorer Features
-g.netrw_liststyle = 3       --- In `Explore` use tree view
+g.netrw_liststyle = 3 --- In `Explore` use tree view
 
 ---  Line Numbering and Cursorline Treatment
-opt.relativenumber = true   --- Relative numbers from actual line
-opt.number = true           --- Show alos absolute number
-opt.wrap = false            --- Keep line unwrapped
+opt.relativenumber = true --- Relative numbers from actual line
+opt.number = true --- Show alos absolute number
+opt.wrap = false --- Keep line unwrapped
 opt.cursorline = true
-opt.signcolumn = "yes"      --- Use at the left a raw for editor signs
+opt.signcolumn = "yes" --- Use at the left a raw for editor signs
 
 ---  Tab Stops
-opt.autoindent = true       --- Indent in next line
-opt.expandtab = true        --- Make tabs to spaces
-opt.tabstop = 2             --- 2 spaces or 1 tab 
-opt.shiftwidth = 2          --- 2 spaces used to intend
+opt.autoindent = true --- Indent in next line
+opt.expandtab = true --- Make tabs to spaces
+opt.tabstop = 2 --- 2 spaces or 1 tab
+opt.shiftwidth = 2 --- 2 spaces used to intend
 
 --- Search Options
-opt.ignorecase = true       --- Make case unsensitive 
-opt.smartcase = true        --- except in case of mixed upper/lower
+opt.ignorecase = true --- Make case unsensitive
+opt.smartcase = true --- except in case of mixed upper/lower
 
 -- Session Settings
-vim.o.sessionoptions="blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
-
+vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
 
 -- Debug Function
 vim.api.nvim_create_autocmd("OptionSet", {
-  pattern = "number,relativenumber",
-  callback = function()
-    if not vim.wo.number or not vim.wo.relativenumber then
-      -- Print a message and the current buffer information to help track the cause
-      print("Line numbers were disabled in buffer " .. vim.fn.bufname() .. " by:")
-      print(debug.traceback())
-    end
-  end
+	pattern = "number,relativenumber",
+	callback = function()
+		if not vim.wo.number or not vim.wo.relativenumber then
+			-- Print a message and the current buffer information to help track the cause
+			print("Line numbers were disabled in buffer " .. vim.fn.bufname() .. " by:")
+			print(debug.traceback())
+		end
+	end,
 })
 
+-- Co Pilot Initial
 
+vim.cmd("Copilot disable")
+
+-- Write with Formating
+
+
+vim.api.nvim_create_user_command("W", function(opts)
+	-- Formatieren der Datei
+	require("conform").format({ lsp_fallback = true, async = false })
+	-- Speichern mit optionalem Argument (z. B. Dateiname)
+	vim.cmd("write " .. (opts.args or ""))
+end, {
+	desc = "Write file with formatting",
+	nargs = "?", -- Optionales Argument erlauben
+})
+
+vim.api.nvim_create_user_command("WA", function()
+	-- Formatieren aller Dateien
+	require("conform").format({ lsp_fallback = true, async = false })
+	-- Alle Dateien speichern
+	vim.cmd("wall")
+end, {
+	desc = "Write all files with formatting",
+})
 

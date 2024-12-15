@@ -1,3 +1,8 @@
+-- Hex: #F4A6C3 (heller Rosaton)
+-- Hex: #E27D9A (dunkler)
+-- Hex: #C85B7A (noch dunkler)
+-- Hex: #9F4160 (am dunkelsten)
+
 return {
   "folke/tokyonight.nvim",
   priority = 1000,

@@ -4,6 +4,19 @@ return {
 	config = function()
 		local lint = require("lint")
 
+		-- clangtidy soll compile_commands.json verwenden
+		lint.linters.clangtidy = {
+			cmd = "clang-tidy", -- Standard clang-tidy Befehl
+			args = {
+				"--quiet",
+				"--compile-commands=./compile_commands.json", -- Datei aus dem Projektverzeichnis verwenden
+			},
+			stdin = false,
+			stream = "stderr",
+			ignore_exitcode = true,
+			parser = require("lint.parser").from_errorformat([[%E%f:%l:%c: %m]]),
+		}
+
 		lint.linters_by_ft = {
 			javascript = { "eslint_d" },
 			typescript = { "eslint_d" },
@@ -13,7 +26,6 @@ return {
 			python = { "pylint" },
 			cpp = { "clangtidy" },
 			c = { "clangtidy" },
-			rust = { "cargo" },
 			lua = { "luacheck" },
 			java = { "checkstyle" },
 		}

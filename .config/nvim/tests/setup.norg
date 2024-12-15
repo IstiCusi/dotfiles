@@ -1,0 +1,16 @@
+@document.meta
+title: setup
+authors: phonon
+tangle: {
+    languages: {
+        lua: ./test-lua-output.lua
+    }
+    scope: all
+}
+@end
+
+
+
+@code lua
+print("Hello")
+@end

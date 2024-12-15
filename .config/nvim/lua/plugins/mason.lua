@@ -53,6 +53,7 @@ return {
 				"rustfmt", -- Rust formatter
 				"shfmt", -- Shell/Zsh formatter
 				"google-java-format", -- Java formatter
+				"rust-analyzer",
 			},
 		})
 	end,
