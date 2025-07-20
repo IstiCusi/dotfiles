@@ -19,7 +19,11 @@ return {
 						},
 					},
 					["core.summary"] = {},
-					["core.tangle"] = { tangle_on_write = true }, -- Das Tangling-Modul aktivieren
+          ["core.tangle"] = {
+            config = {
+              tangle_on_write = true,
+            },
+          },
 					["core.concealer"] = {}, -- Adds pretty icons to your documents
 					["core.itero"] = {}, -- <M-CR> to add header/list items
 					["core.promo"] = {}, -- promotes/demotes headers, etc

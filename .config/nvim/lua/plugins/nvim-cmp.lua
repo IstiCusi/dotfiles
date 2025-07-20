@@ -28,6 +28,21 @@ return {
 		require("luasnip.loaders.from_vscode").lazy_load()
 
 		cmp.setup({
+
+      -- window = {
+      --   documentation = {
+      --     border = "rounded",
+      --     max_height = 15,
+      --     max_width = 60,
+      --     winhighlight = "NormalFloat:NormalFloat,FloatBorder:FloatBorder",
+      --     zindex = 50,
+      --     position = {
+      --       row = -1, -- nach oben
+      --       col = 0,
+      --     },
+      --   },
+      -- },
+
 			completion = {
 				keyword_length = 3,
 				completeopt = "menu,menuone,preview,noselect",

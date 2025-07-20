@@ -1,10 +1,15 @@
 --- TODO:  space ca  .. keygroups needs an update about group c
 
 ---  ----------------------------- Local Alias -------------------------------
+
 local g = vim.g
 local map = vim.keymap.set
-Phonon = Phonon or {}
+
+_G.Phonon = _G.Phonon or {}
+local Phonon = _G.Phonon
+
 Phonon.keygroups = {}
+
 ---  --------------------------------------------------------------------------
 
 --- Set Leader Key ------------------------------------------------------------
@@ -47,17 +52,17 @@ map("n", "<S-Tab>", "<cmd>tabp<CR>", { desc = "Jump to previous tab" })
 map("n", "<Tab>", "<cmd>tabn<CR>", { desc = "Jump to next tab" })
 
 --- Telescope and search bindings -------------------------------------------------------
-table.insert(Phonon.keygroups, { "<leader>f", desc = "Telescope" })
-function Phonon.telescopeKeys()
-	local keymap = vim.keymap
-	keymap.set("n", "<leader>ff", "<cmd>Telescope find_files<cr>", { desc = "Fuzzy find files in cwd" })
-	keymap.set("n", "<leader>fr", "<cmd>Telescope oldfiles<cr>", { desc = "Fuzzy find recent files" })
-	keymap.set("n", "<leader>fs", "<cmd>Telescope live_grep<cr>", { desc = "Find string in cwd" })
-	keymap.set("n", "<leader>fc", "<cmd>Telescope grep_string<cr>", { desc = "Find string under cursor in cwd" })
-	keymap.set("n", "<leader>ft", "<cmd>TodoTelescope<cr>", { desc = "Find todos" })
-	keymap.set( "n", "<leader>fi", ':lua require("modules.lookup_includes").search_standard_includes()<CR>', { desc = "Search Includes" })
-end
 
+table.insert(Phonon.keygroups, { "<leader>f", desc = "Telescope" })
+
+Phonon.telescope = {
+  { "<leader>ff", "<cmd>Telescope find_files<cr>",    desc = "Telescope ❯ find files" },
+  { "<leader>fr", "<cmd>Telescope oldfiles<cr>",      desc = "Telescope ❯ recent files" },
+  { "<leader>fs", "<cmd>Telescope live_grep<cr>",     desc = "Telescope ❯ live grep" },
+  { "<leader>fc", "<cmd>Telescope grep_string<cr>",   desc = "Telescope ❯ grep under cursor" },
+  { "<leader>ft", "<cmd>TodoTelescope<cr>",           desc = "Telescope ❯ todos" },
+  { "<leader>fi", "<cmd>lua require('modules.lookup_includes').search_standard_includes()<CR>", desc = "Telescope ❯ search includes" },
+}
 
 vim.api.nvim_set_keymap("n", "<leader>fm", ":lua SearchManPageForCurrentWord()<CR>", { noremap = true , desc ="Search Man Pages"})
 function SearchManPageForCurrentWord()
@@ -92,9 +97,6 @@ function SearchManPageForCurrentWord()
     end
 end
 
-
-
-
 --- Open New Tabs ------------------------------------------------------------
 table.insert(Phonon.keygroups, { "<leader>t", desc = "Tabs" })
 map("n", "<leader>to", "<cmd>tabnew<CR>", { desc = "Open new tab" })
@@ -113,34 +115,40 @@ map("n", "<leader>tf", function()
 end, { desc = "Open in new tab" })
 
 --- Oil File Explorer -------------------------------------------------------
+
 function OilOpen()
-	vim.cmd("split | wincmd j")
-	require("oil").open()
+	require("oil").open(vim.fn.getcwd())
 end
+
+function OilOpenSplit()
+	vim.cmd("split | wincmd j")
+	require("oil").open(vim.fn.getcwd())
+end
+
 table.insert(Phonon.keygroups, { "<leader>-", desc = "Open Oil As Split", icon="🛢️" })
 
-map("n", "-", "<cmd>Oil<CR>", { desc = "Open Oil" })
-map("n", "<leader>-", OilOpen, { desc = "Open Oil As Split" })
+map("n", "-", OilOpen, { desc = "Open Oil" })
+map("n", "<leader>-", OilOpenSplit, { desc = "Open Oil As Split" })
 
-Phonon.oilKeys = {
-	["?"] = "actions.show_help",
-	["<CR>"] = "actions.select",
-	["<C-s>"] = { "actions.select", opts = { vertical = true }, desc = "Open the entry in a vertical split" },
-	["<C-h>"] = { "actions.select", opts = { horizontal = true }, desc = "Open the entry in a horizontal split" },
-	["<C-t>"] = { "actions.select", opts = { tab = true }, desc = "Open the entry in new tab" },
-	["<C-p>"] = "actions.preview",
-	["<C-c>"] = "actions.close",
-	["<C-l>"] = "actions.refresh",
-	["-"] = "actions.parent",
-	["_"] = "actions.open_cwd",
-	["`"] = "actions.cd",
-	["~"] = { "actions.cd", opts = { scope = "tab" }, desc = ":tcd to the current oil directory", mode = "n" },
-	["gs"] = "actions.change_sort",
-	["gx"] = "actions.open_external",
-	["g."] = "actions.toggle_hidden",
-	["g\\"] = "actions.toggle_trash",
-}
-
+-- Phonon.oilKeys = {
+-- 	["?"] = "actions.show_help",
+-- 	["<CR>"] = "actions.select",
+-- 	["<C-s>"] = { "actions.select", opts = { vertical = true }, desc = "Open the entry in a vertical split" },
+-- 	["<C-h>"] = { "actions.select", opts = { horizontal = true }, desc = "Open the entry in a horizontal split" },
+-- 	["<C-t>"] = { "actions.select", opts = { tab = true }, desc = "Open the entry in new tab" },
+-- 	["<C-p>"] = "actions.preview",
+-- 	["<C-c>"] = "actions.close",
+-- 	["<C-l>"] = "actions.refresh",
+-- 	["-"] = "actions.parent",
+-- 	["_"] = "actions.open_cwd",
+-- 	["`"] = "actions.cd",
+-- 	["~"] = { "actions.cd", opts = { scope = "tab" }, desc = ":tcd to the current oil directory", mode = "n" },
+-- 	["gs"] = "actions.change_sort",
+-- 	["gx"] = "actions.open_external",
+-- 	["g."] = "actions.toggle_hidden",
+-- 	["g\\"] = "actions.toggle_trash",
+-- }
+--
 --- Nvim File Explorer ------------------------------------------------------
 table.insert(Phonon.keygroups, { "<leader>e" , desc = "Explorer", icon ="📂" })
 -- map("n", "<C-n>", "<cmd>NvimTreeToggle<CR>", { desc = "Toggle file explorer" })
@@ -175,14 +183,13 @@ Phonon.treesitterSelection = {
 
 -- Special keys for programming ---------------------------------------------
 
-table.insert(Phonon.keygroups, { "<leader>s", desc = "Substitute", icon ="🪚"})
-function Phonon.substituteKeys()
-	local keymap = vim.keymap
-	local substitute = require("substitute")
-	keymap.set("n", "<leader>ss", substitute.operator, { desc = "Substitute with motion" })
-	keymap.set("n", "<leader>sS", substitute.line, { desc = "Substitute line" })
-	keymap.set("x", "<leader>sv", substitute.visual, { desc = "Substitute in visual mode" })
-end
+-- Phonon = Phonon or {}
+Phonon.substitute_keymaps = {
+  -- Modus, Key, Funktion (als String), Description
+  { "n", "gs", "operator", "g-Substitute with motion" },
+  { "n", "gS", "line",     "g-Substitute whole line" },
+  { "x", "gs", "visual",   "g-Substitute in visual mode" },
+}
 
 -- Other convinient mappings -------------------------------------------------
 -- table.insert(Phonon.keygroups, { "<leader>n", "Switch On/Off", desc = "Switch On/Off", icon = "⏻" })
@@ -319,6 +326,9 @@ Phonon.VM_maps = {
 
 -- Nvorg Mode ----------------------------------------------------------------
 table.insert(Phonon.keygroups, { "<leader>o", "neorg", desc = "neorg", icon ="🗒️" })
+
+map("n", "<Leader>oo", ":Neorg index<CR>", { noremap = true, silent = true })
+
 map("n", "<Leader>oc", "<Plug>(neorg.qol.todo-items.todo.task-cycle)", { noremap = true, silent = true })
 map("n", "<Leader>om", "<Plug>(neorg.looking-glass.magnify-code-block)", { noremap = true, silent = true })
 map("n", "<Leader>od", "<Plug>(neorg.tempus.insert-date)", { noremap = true, silent = true })
@@ -375,3 +385,28 @@ vim.api.nvim_set_keymap("n", "<leader>np", ":lua print_with_minted()<CR>", { des
 Phonon.venvKeys = {
 	{ "<leader>nv", "<cmd>VenvSelect<cr>", desc = "Choose Python variant" },
 }
+
+
+local function zig_term_in_buffer_dir(cmd)
+  local dir = vim.fn.expand('%:p:h')
+  -- Wir öffnen ein Terminal-Split, wechseln ins Verzeichnis und führen das Kommando aus:
+  vim.cmd('split | terminal bash -c "cd ' .. dir .. ' && ' .. cmd .. '; exec bash"')
+end
+
+vim.api.nvim_create_user_command('Zb', function()
+  zig_term_in_buffer_dir('zig build')
+end, {})
+
+vim.api.nvim_create_user_command('Zbr', function()
+  zig_term_in_buffer_dir('zig build run')
+end, {})
+
+vim.api.nvim_create_user_command('Zt', function()
+  zig_term_in_buffer_dir('zig test')
+end, {})
+
+vim.api.nvim_create_user_command('Zr', function()
+  local file = vim.fn.expand('%:t')
+  zig_term_in_buffer_dir('zig run ' .. file)
+end, {})
+

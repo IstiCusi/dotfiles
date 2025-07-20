@@ -1,61 +1,87 @@
 return {
-	-- Copilot Plugin
-	{
-		"zbirenbaum/copilot.lua",
-		cmd = "Copilot",
-		event = "InsertEnter",
-		config = function()
-			require("copilot").setup({
-				panel = {
-					enabled = true,
-					auto_refresh = true,
-					keymap = {
-						jump_prev = "<C-A-k>", -- Springe zum vorherigen Vorschlag im Panel
-						jump_next = "<C-A-j>", -- Springe zum nächsten Vorschlag im Panel
-						accept = "<C-A-CR>", -- Vorschlag im Panel annehmen
-						refresh = "<C-A-r>", -- Panel aktualisieren
-						open = "<C-A-o>", -- Panel öffnen
-					},
-					layout = {
-						position = "bottom",
-						ratio = 0.4,
-					},
-				},
-				suggestion = {
-					enabled = true,
-					auto_trigger = true,
-					hide_during_completion = true,
-					debounce = 75,
-					keymap = {
-						accept = "<C-A-a>", -- Vorschlag annehmen
-						next = "<C-A-j>", -- Nächsten Vorschlag anzeigen
-						prev = "<C-A-k>", -- Vorherigen Vorschlag anzeigen
-						dismiss = "<C-A-x>", -- Vorschlag ablehnen
-					},
-				},
-				filetypes = {
-					yaml = false,
-					markdown = false,
-					help = false,
-					gitcommit = false,
-					gitrebase = false,
-					hgcommit = false,
-					svn = false,
-					cvs = false,
-					["."] = false,
-				},
-				copilot_node_command = "node", -- Node.js version must be > 18.x
-				server_opts_overrides = {},
-			})
-		end,
-	},
+  -- Copilot Plugin (standardmäßig deaktiviert)
+  {
+    "zbirenbaum/copilot.lua",
+    cmd = "Copilot",
+    event = "InsertEnter",
+    config = function()
+      -- Nur diese Warnung unterdrücken
+      local orig_notify = vim.notify
+      vim.notify = function(msg, level, opts)
+        if type(msg) == "string"
+            and msg:match("%[Copilot%.lua%] copilot is disabled") then
+          return
+        end
+        return orig_notify(msg, level, opts)
+      end
 
-	-- copilot-cmp Integration
-	{
-		"zbirenbaum/copilot-cmp",
-		after = { "copilot.lua" },
-		config = function()
-			require("copilot_cmp").setup()
-		end,
-	},
+      -- Anfangsstatus global deaktiviert
+      vim.g.copilot_enabled = false
+
+      require("copilot").setup({
+        panel = {
+          enabled = true,        -- Panel ist konfiguriert, aber Copilot tut nichts
+          auto_refresh = true,
+          keymap = {
+            jump_prev = "<C-A-k>",
+            jump_next = "<C-A-j>",
+            accept     = "<C-A-CR>",
+            refresh    = "<C-A-r>",
+            open       = "<C-A-o>",
+          },
+          layout = {
+            position = "bottom",
+            ratio = 0.4,
+          },
+        },
+        suggestion = {
+          enabled = false,       -- Vorschläge deaktiviert (standard)
+          auto_trigger = true,
+          hide_during_completion = true,
+          debounce = 75,
+          keymap = {
+            accept = "<C-A-a>",
+            next = "<C-A-j>",
+            prev = "<C-A-k>",
+            dismiss = "<C-A-x>",
+          },
+        },
+        filetypes = {
+          yaml = false,
+          markdown = false,
+          help = false,
+          gitcommit = false,
+          gitrebase = false,
+          hgcommit = false,
+          svn = false,
+          cvs = false,
+          ["."] = false,
+          ["*"] = false,  -- Fängt alle sonstigen Dateitypen ab
+        },
+        copilot_node_command = "node",
+        server_opts_overrides = {},
+      })
+
+      -- Status-Monitoring für lualine
+      vim.defer_fn(function()
+        local ok, api = pcall(require, "copilot.api")
+        if ok and api and api.register_status_notification_handler then
+          api.register_status_notification_handler(function(data)
+            vim.g.copilot_enabled = data.status == "Normal"
+            vim.cmd("redrawstatus")
+          end)
+        end
+      end, 100)
+    end,
+  },
+
+  -- Copilot + cmp
+  {
+    "zbirenbaum/copilot-cmp",
+    after = { "copilot.lua" },
+    config = function()
+      require("copilot_cmp").setup()
+    end,
+  },
 }
+

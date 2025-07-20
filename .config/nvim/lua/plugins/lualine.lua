@@ -235,6 +235,43 @@ return {
 			return vim.g.copilot_enabled and "✈️" or ""
 		end
 
+    -- local function compiler_version(
+    --   local ft = vim.bo.filetype
+    --   if ft ~= "c" and ft ~= "cpp" then return "" end
+    --   local ok, cresolve = pcall(require, "cresolve")
+    --   if not ok then return "" end
+    --   local f = io.open(vim.fn.stdpath("config") .. "/scripts/cresolve/state.json", "r")
+    --   if not f then return "[?]" end
+    --   local content = f:read("*a")
+    --   f:close()
+    --   local ok, state = pcall(vim.json.decode, content)
+    --   if not ok or not state.active_config then return "[?]" end
+    --   return "[" .. state.active_config .. "]"
+    -- end
+
+    local function filetype_with_compiler()
+      local ft = vim.bo.filetype
+      if ft ~= "c" and ft ~= "cpp" then return ft end
+      local f = io.open(vim.fn.stdpath("config") .. "/scripts/clective/state.json", "r")
+      if not f then return ft end
+      local content = f:read("*a")
+      f:close()
+      local ok, state = pcall(vim.json.decode, content)
+      if not ok or not state.active_config then return ft end
+      return ft .. "[" .. state.active_config .. "]"
+    end
+    -- local function filetype_with_compiler()
+    --   local ft = vim.bo.filetype
+    --   if ft ~= "c" and ft ~= "cpp" then return ft end
+    --   local f = io.open(vim.fn.stdpath("config") .. "/scripts/cresolve/state.json", "r")
+    --   if not f then return ft end
+    --   local content = f:read("*a")
+    --   f:close()
+    --   local ok, state = pcall(vim.json.decode, content)
+    --   if not ok or not state.active_config then return ft end
+    --   return ft .. "[" .. state.active_config .. "]"
+    -- end
+
 		-- Konfiguration von lualine mit Copilot-Status und Lazy-Update-Anzeige
 		lualine.setup({
 			options = {
@@ -249,18 +286,22 @@ return {
 					},
 					{ copilot_status }, -- Zeigt Copilot-Status
 					{ "encoding" },
+          -- { "filetype" },
+          { filetype_with_compiler },
 					{ "fileformat" },
-					{ "filetype" },
+					-- { "filetype" },
 				},
 			},
 		})
 
 		-- Status-Handler für Copilot, um lualine zu aktualisieren
 		vim.defer_fn(function()
-			require("copilot.api").register_status_notification_handler(function(data)
-				vim.g.copilot_enabled = data.status == "Normal"
-				lualine.refresh() -- Aktualisiert lualine
-			end)
+			-- require("copilot.api").register_status_notification_handler(function(data)
+			-- 	vim.g.copilot_enabled = data.status == "Normal"
+			-- 	lualine.refresh() -- Aktualisiert lualine
+			-- end)
 		end, 100)
+
+
 	end,
 }

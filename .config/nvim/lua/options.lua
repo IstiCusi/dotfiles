@@ -9,7 +9,10 @@ local g = vim.g
 local pyenv_global_python = vim.fn.system("pyenv global"):gsub("%s+", "")
 
 -- Set the Python3 host program for Neovim (not for the editor)
-g.python3_host_prog = pyenv_global_python
+-- g.python3_host_prog = pyenv_global_python
+
+local version = vim.fn.system("pyenv global"):gsub("%s+", "")
+g.python3_host_prog = "/home/phonon/.pyenv/versions/" .. version .. "/bin/python"
 
 --- Switch off not functioning providers
 g.loaded_perl_provider = 0
@@ -55,16 +58,16 @@ opt.smartcase = true --- except in case of mixed upper/lower
 vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
 
 -- Debug Function
-vim.api.nvim_create_autocmd("OptionSet", {
-	pattern = "number,relativenumber",
-	callback = function()
-		if not vim.wo.number or not vim.wo.relativenumber then
-			-- Print a message and the current buffer information to help track the cause
-			print("Line numbers were disabled in buffer " .. vim.fn.bufname() .. " by:")
-			print(debug.traceback())
-		end
-	end,
-})
+-- vim.api.nvim_create_autocmd("OptionSet", {
+-- 	pattern = "number,relativenumber",
+-- 	callback = function()
+-- 		if not vim.wo.number or not vim.wo.relativenumber then
+-- 			-- Print a message and the current buffer information to help track the cause
+-- 			print("Line numbers were disabled in buffer " .. vim.fn.bufname() .. " by:")
+-- 			print(debug.traceback())
+-- 		end
+-- 	end,
+-- })
 
 -- Co Pilot Initial
 
@@ -91,4 +94,8 @@ vim.api.nvim_create_user_command("WA", function()
 end, {
 	desc = "Write all files with formatting",
 })
+
+-- Set background color for floating windows (api for example)
+vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#000011" })
+vim.api.nvim_set_hl(0, "FloatBorder", { bg = "#000011", fg = "#223322" })
 
