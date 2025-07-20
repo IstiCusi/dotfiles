@@ -1,0 +1,4 @@
+# ausschließen
+backups/
+installations/
+tests/
