@@ -226,13 +226,19 @@ Phonon.surroundKeys = {
 
 -- trouble keys ----------------------------------------------------------------
 table.insert(Phonon.keygroups, { "<leader>x", desc = "trouble", icon = "⚠️" })
-Phonon.troublekeys = {
-	{ "<leader>xw", "<cmd>trouble diagnostics toggle<cr>", desc = "open trouble workspace diagnostics" },
-	{ "<leader>xd", "<cmd>trouble diagnostics toggle filter.buf=0<cr>", desc = "open trouble document diagnostics" },
-	{ "<leader>xq", "<cmd>trouble quickfix toggle<cr>", desc = "open trouble quickfix list" },
-	{ "<leader>xl", "<cmd>trouble loclist toggle<cr>", desc = "open trouble location list" },
-	{ "<leader>xt", "<cmd>trouble todo toggle<cr>", desc = "open todos in trouble" },
+Phonon.troubleKeys = {
+  -- workspace diagnostics
+  { "<leader>xw", "<cmd>Trouble diagnostics toggle<cr>",                desc = "open trouble workspace diagnostics" },
+  -- current-buffer diagnostics
+  { "<leader>xd", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",  desc = "open trouble document diagnostics" },
+  -- quickfix list
+  { "<leader>xq", "<cmd>Trouble qflist toggle<cr>",                     desc = "open trouble quickfix list" },
+  -- location list
+  { "<leader>xl", "<cmd>Trouble loclist toggle<cr>",                   desc = "open trouble location list" },
+  -- project TODOs (from folke/todo-comments.nvim)
+  { "<leader>xt", "<cmd>Trouble todo toggle<cr>",                      desc = "open todos in trouble" },
 }
+
 
 -- delete comment --------------------------------------------------------------
 -- todo: because it interferes with normal motions, the whichkey plugin does not propose a completion
