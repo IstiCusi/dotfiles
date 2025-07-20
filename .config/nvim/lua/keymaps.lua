@@ -226,19 +226,44 @@ Phonon.surroundKeys = {
 
 -- trouble keys ----------------------------------------------------------------
 table.insert(Phonon.keygroups, { "<leader>x", desc = "trouble", icon = "⚠️" })
-Phonon.troubleKeys = {
-  -- workspace diagnostics
-  { "<leader>xw", "<cmd>Trouble diagnostics toggle<cr>",                desc = "open trouble workspace diagnostics" },
-  -- current-buffer diagnostics
-  { "<leader>xd", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",  desc = "open trouble document diagnostics" },
-  -- quickfix list
-  { "<leader>xq", "<cmd>Trouble qflist toggle<cr>",                     desc = "open trouble quickfix list" },
-  -- location list
-  { "<leader>xl", "<cmd>Trouble loclist toggle<cr>",                   desc = "open trouble location list" },
-  -- project TODOs (from folke/todo-comments.nvim)
-  { "<leader>xt", "<cmd>Trouble todo toggle<cr>",                      desc = "open todos in trouble" },
-}
 
+Phonon.troubleKeys = {
+  {
+    "<leader>xx",
+    "<cmd>Trouble diagnostics toggle<cr>",
+    desc = "Diagnostics (Trouble)",
+  },
+  {
+    "<leader>xX",
+    "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
+    desc = "Buffer Diagnostics (Trouble)",
+  },
+  {
+    "<leader>cs",
+    "<cmd>Trouble symbols toggle focus=false<cr>",
+    desc = "Symbols (Trouble)",
+  },
+  {
+    "<leader>cl",
+    "<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
+    desc = "LSP Definitions / references / ... (Trouble)",
+  },
+  {
+    "<leader>xL",
+    "<cmd>Trouble loclist toggle<cr>",
+    desc = "Location List (Trouble)",
+  },
+  {
+    "<leader>xQ",
+    "<cmd>Trouble qflist toggle<cr>",
+    desc = "Quickfix List (Trouble)",
+  },
+  {
+    "<leader>xt",
+    "<cmd>Trouble todo toggle<cr>",
+    desc = "TODO List (Trouble)",
+  },
+}
 
 -- delete comment --------------------------------------------------------------
 -- todo: because it interferes with normal motions, the whichkey plugin does not propose a completion
