@@ -21,7 +21,7 @@ return {
       ensure_installed = {
         "lua_ls", "pyright", "clangd", "rust_analyzer",
         "svelte", "graphql", "emmet_ls", "matlab_ls", "csharp_ls",
-        "zls"
+        "zls", "jdtls"
       },
       automatic_installation = true,
     })
@@ -100,65 +100,69 @@ return {
     vim.api.nvim_create_autocmd("LspAttach", {
       group = vim.api.nvim_create_augroup("UserLspConfig", {}),
       callback = function(ev)
-        local opts = { buffer = ev.buf, silent = true }
-        local map = vim.keymap.set
-
-        map("n", "gR", "<cmd>Telescope lsp_references<CR>", {
-          desc = "Show LSP references", buffer = opts.buffer,
-        })
-
-        map("n", "gD", vim.lsp.buf.declaration, {
-          desc = "Go to declaration", buffer = opts.buffer,
-        })
-
-        map("n", "gd", "<cmd>Telescope lsp_definitions<CR>", {
-          desc = "Show definitions", buffer = opts.buffer,
-        })
-
-        map("n", "gi", "<cmd>Telescope lsp_implementations<CR>", {
-          desc = "Show implementations", buffer = opts.buffer,
-        })
-
-        map("n", "gt", "<cmd>Telescope lsp_type_definitions<CR>", {
-          desc = "Show type definitions", buffer = opts.buffer,
-        })
-
-        map({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, {
-          desc = "Code actions", buffer = opts.buffer,
-        })
-
-        map("n", "<leader>rn", vim.lsp.buf.rename, {
-          desc = "Rename", buffer = opts.buffer,
-        })
-
-        map("n", "<leader>D", "<cmd>Telescope diagnostics bufnr=0<CR>", {
-          desc = "Buffer diagnostics", buffer = opts.buffer,
-        })
-
-        map("n", "<leader>d", vim.diagnostic.open_float, {
-          desc = "Line diagnostics", buffer = opts.buffer,
-        })
-
-        map("n", "[d", function()
-          vim.diagnostic.jump({ count = -1 })
-        end, {
-          desc = "Previous diagnostic", buffer = opts.buffer,
-        })
-
-        map("n", "]d", function()
-          vim.diagnostic.jump({ count = 1 })
-        end, {
-          desc = "Next diagnostic", buffer = opts.buffer,
-        })
-
-        map("n", "K", vim.lsp.buf.hover, {
-          desc = "Hover doc", buffer = opts.buffer,
-        })
-
-        map("n", "<leader>rs", ":LspRestart<CR>", {
-          desc = "Restart LSP", buffer = opts.buffer,
-        })
+        Phonon.lsp_on_attach(ev.buf)
+        -- require("keysettings").lsp_on_attach(ev.buf)
       end,
+      -- callback = function(ev)
+      --   local opts = { buffer = ev.buf, silent = true }
+      --   local map = vim.keymap.set
+      --
+      --   map("n", "gR", "<cmd>Telescope lsp_references<CR>", {
+      --     desc = "Show LSP references", buffer = opts.buffer,
+      --   })
+      --
+      --   map("n", "gD", vim.lsp.buf.declaration, {
+      --     desc = "Go to declaration", buffer = opts.buffer,
+      --   })
+      --
+      --   map("n", "gd", "<cmd>Telescope lsp_definitions<CR>", {
+      --     desc = "Show definitions", buffer = opts.buffer,
+      --   })
+      --
+      --   map("n", "gi", "<cmd>Telescope lsp_implementations<CR>", {
+      --     desc = "Show implementations", buffer = opts.buffer,
+      --   })
+      --
+      --   map("n", "gt", "<cmd>Telescope lsp_type_definitions<CR>", {
+      --     desc = "Show type definitions", buffer = opts.buffer,
+      --   })
+      --
+      --   map({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, {
+      --     desc = "Code actions", buffer = opts.buffer,
+      --   })
+      --
+      --   map("n", "<leader>rn", vim.lsp.buf.rename, {
+      --     desc = "Rename", buffer = opts.buffer,
+      --   })
+      --
+      --   map("n", "<leader>D", "<cmd>Telescope diagnostics bufnr=0<CR>", {
+      --     desc = "Buffer diagnostics", buffer = opts.buffer,
+      --   })
+      --
+      --   map("n", "<leader>d", vim.diagnostic.open_float, {
+      --     desc = "Line diagnostics", buffer = opts.buffer,
+      --   })
+      --
+      --   map("n", "[d", function()
+      --     vim.diagnostic.jump({ count = -1 })
+      --   end, {
+      --     desc = "Previous diagnostic", buffer = opts.buffer,
+      --   })
+      --
+      --   map("n", "]d", function()
+      --     vim.diagnostic.jump({ count = 1 })
+      --   end, {
+      --     desc = "Next diagnostic", buffer = opts.buffer,
+      --   })
+      --
+      --   map("n", "K", vim.lsp.buf.hover, {
+      --     desc = "Hover doc", buffer = opts.buffer,
+      --   })
+      --
+      --   map("n", "<leader>rs", ":LspRestart<CR>", {
+      --     desc = "Restart LSP", buffer = opts.buffer,
+      --   })
+      -- end,
     })
 
     local signs = {

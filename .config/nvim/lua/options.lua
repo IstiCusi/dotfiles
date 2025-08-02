@@ -75,7 +75,6 @@ vim.cmd("Copilot disable")
 
 -- Write with Formating
 
-
 vim.api.nvim_create_user_command("W", function(opts)
 	-- Formatieren der Datei
 	require("conform").format({ lsp_fallback = true, async = false })
@@ -98,4 +97,28 @@ end, {
 -- Set background color for floating windows (api for example)
 vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#000011" })
 vim.api.nvim_set_hl(0, "FloatBorder", { bg = "#000011", fg = "#223322" })
+
+-- FixWhiteSpace
+
+-- vim.api.nvim_create_user_command("FixWhiteSpace", function()
+--   vim.cmd([[%s/\s\+$//e]])
+-- end, { desc = "Remove trailing whitespace" })
+
+vim.api.nvim_create_user_command("FixWhiteSpace", function()
+  local bufnr = vim.api.nvim_get_current_buf()
+  local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+  local modified = false
+
+  for i, line in ipairs(lines) do
+    local cleaned = line:gsub("%s+$", "")
+    if cleaned ~= line then
+      lines[i] = cleaned
+      modified = true
+    end
+  end
+
+  if modified then
+    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
+  end
+end, { desc = "Remove trailing whitespace" })
 

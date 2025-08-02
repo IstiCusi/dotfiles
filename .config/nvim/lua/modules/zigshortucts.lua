@@ -1,0 +1,22 @@
+-- local function zig_term_in_buffer_dir(cmd)
+--   local dir = vim.fn.expand('%:p:h')
+--   vim.cmd('split | terminal bash -c "cd ' .. dir .. ' && ' .. cmd .. '; exec bash"')
+-- end
+--
+-- vim.api.nvim_create_user_command('Zb', function()
+--   zig_term_in_buffer_dir('zig build')
+-- end, {})
+--
+-- vim.api.nvim_create_user_command('Zbr', function()
+--   zig_term_in_buffer_dir('zig build run')
+-- end, {})
+--
+-- vim.api.nvim_create_user_command('Zt', function()
+--   zig_term_in_buffer_dir('zig test')
+-- end, {})
+--
+-- vim.api.nvim_create_user_command('Zr', function()
+--   local file = vim.fn.expand('%:t')
+--   zig_term_in_buffer_dir('zig run ' .. file)
+-- end, {})
+--

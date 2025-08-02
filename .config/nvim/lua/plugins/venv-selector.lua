@@ -4,7 +4,7 @@
 -- 	local file = io.open("/tmp/venv_change.log", "a") -- /tmp ist ein Beispielpfad
 -- 	file:write("changed_python wurde aufgerufen mit " .. venv_path .. "\n")
 -- 	file:close()
--- 	vim.notify("Virtuelle Umgebung geändert auf: " .. venv_path, vim.log.levels.INFO)
+-- 	vim.schedule(function() vim.schedule(function() vim.notify("Virtuelle Umgebung geändert auf: " .. venv_path, vim.log.levels.INFO) end) end)
 -- end
 
 return {

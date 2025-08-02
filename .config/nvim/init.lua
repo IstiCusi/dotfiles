@@ -24,3 +24,4 @@ require("scratch")
 if os.getenv("TERM") == "linux" then
   vim.cmd("colorscheme blue")
 end
+

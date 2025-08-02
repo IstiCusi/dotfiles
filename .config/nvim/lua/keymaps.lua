@@ -3,6 +3,7 @@
 ---  ----------------------------- Local Alias -------------------------------
 
 local g = vim.g
+
 local map = vim.keymap.set
 
 _G.Phonon = _G.Phonon or {}
@@ -23,7 +24,9 @@ map("n", "<C-c>", "<cmd>bd<CR>", { desc = "Close window and buffer" })
 map("t", "<C-c>", "<cmd>bd!<CR>", { desc = "Close window and buffer" })
 
 --- Open nvim internal terminal ----------------------------------------------
-map("n", "<leader>tt", ":terminal<CR>", { noremap = true, silent = true, desc = "Terminal" })
+map("n", "<leader>nt", ":terminal<CR>", { noremap = true, silent = true, desc = "Normal Terminal" })
+map("n", "<leader>tt", "<cmd>ToggleTerm<cr>", { desc = "Toggle Terminal" })
+
 --- TODO: C-c to close terminal in all cases (normal and insert mode)
 
 -- Leaping -------------------------------------------------------------------
@@ -50,6 +53,23 @@ map("n", "<leader><S-Tab>", "<cmd>bp<CR>", { desc = "Jump to previous buffer" })
 map("n", "<leader><Tab>", "<cmd>bn<CR>", { desc = "Jump to next buffer" })
 map("n", "<S-Tab>", "<cmd>tabp<CR>", { desc = "Jump to previous tab" })
 map("n", "<Tab>", "<cmd>tabn<CR>", { desc = "Jump to next tab" })
+
+--- Open New Tabs -------------------------------------------------------------
+table.insert(Phonon.keygroups, { "<leader>t", desc = "Tabs" })
+map("n", "<leader>to", "<cmd>tabnew<CR>", { desc = "Open new tab" })
+map("n", "<leader>tc", "<cmd>tabclose<CR>", { desc = "Close current tab" })
+map("n", "<leader>tf", function()
+	require("telescope.builtin").find_files({
+		attach_mappings = function(_, map)
+			map("i", "<CR>", function(prompt_bufnr)
+				local selected = require("telescope.actions.state").get_selected_entry()
+				require("telescope.actions").close(prompt_bufnr)
+				vim.cmd("tabnew " .. selected.path)
+			end)
+			return true
+		end,
+	})
+end, { desc = "Open in new tab" })
 
 --- Telescope and search bindings -------------------------------------------------------
 
@@ -97,23 +117,6 @@ function SearchManPageForCurrentWord()
     end
 end
 
---- Open New Tabs ------------------------------------------------------------
-table.insert(Phonon.keygroups, { "<leader>t", desc = "Tabs" })
-map("n", "<leader>to", "<cmd>tabnew<CR>", { desc = "Open new tab" })
-map("n", "<leader>tc", "<cmd>tabclose<CR>", { desc = "Close current tab" })
-map("n", "<leader>tf", function()
-	require("telescope.builtin").find_files({
-		attach_mappings = function(_, map)
-			map("i", "<CR>", function(prompt_bufnr)
-				local selected = require("telescope.actions.state").get_selected_entry()
-				require("telescope.actions").close(prompt_bufnr)
-				vim.cmd("tabnew " .. selected.path)
-			end)
-			return true
-		end,
-	})
-end, { desc = "Open in new tab" })
-
 --- Oil File Explorer -------------------------------------------------------
 
 function OilOpen()
@@ -148,7 +151,7 @@ map("n", "<leader>-", OilOpenSplit, { desc = "Open Oil As Split" })
 -- 	["g."] = "actions.toggle_hidden",
 -- 	["g\\"] = "actions.toggle_trash",
 -- }
---
+
 --- Nvim File Explorer ------------------------------------------------------
 table.insert(Phonon.keygroups, { "<leader>e" , desc = "Explorer", icon ="📂" })
 -- map("n", "<C-n>", "<cmd>NvimTreeToggle<CR>", { desc = "Toggle file explorer" })
@@ -193,6 +196,7 @@ Phonon.substitute_keymaps = {
 
 -- Other convinient mappings -------------------------------------------------
 -- table.insert(Phonon.keygroups, { "<leader>n", "Switch On/Off", desc = "Switch On/Off", icon = "⏻" })
+
 table.insert(Phonon.keygroups, { "<leader>n", desc = "Switch On/Off", icon = "⏻" })
 map("n", "<leader>nl", ":IBLToggle<CR>", { desc = "Switch on/off indent lines" })
 map("n", "<leader>nh", ":lua ToggleHlsearch()<CR>", { desc = "Switch on/off highlight" })
@@ -211,12 +215,12 @@ function ToggleHlsearch()
 	end
 end
 
--- Surround Keys --------------------------------------------------------------
-table.insert(Phonon.keygroups, { "<leader>S", desc = "Surround", icon = "🌀" })
+
+table.insert(Phonon.keygroups, { "<leader>s", desc = "Surround", icon = "🌀" })
 Phonon.surroundKeys = {
 	insert = false, -- unset, because too slow input mode
 	insert_line = false, -- unset because too slow input mode
-	normal = "<leader>s", -- surround in normal mode
+	normal = "<leader>ss", -- surround in normal mode
 	normal_cur = "<leader>sc", -- surround current line/selection in normal mode
 	visual = "<leader>sv", -- surround in visual mode
 	visual_line = "<leader>sl", -- surround entire line in visual mode
@@ -226,6 +230,8 @@ Phonon.surroundKeys = {
 
 -- trouble keys ----------------------------------------------------------------
 table.insert(Phonon.keygroups, { "<leader>x", desc = "trouble", icon = "⚠️" })
+
+table.insert(Phonon.keygroups, { "<leader>c", desc = "Correct", icon = "🩹" })
 
 Phonon.troubleKeys = {
   {
@@ -358,24 +364,44 @@ Phonon.VM_maps = {
 -- Nvorg Mode ----------------------------------------------------------------
 table.insert(Phonon.keygroups, { "<leader>o", "neorg", desc = "neorg", icon ="🗒️" })
 
-map("n", "<Leader>oo", ":Neorg index<CR>", { noremap = true, silent = true })
+-- map("n", "<Leader>oo", ":Neorg index<CR>", { noremap = true, silent = true })
+--
+-- map("n", "<Leader>oc", "<Plug>(neorg.qol.todo-items.todo.task-cycle)", { noremap = true, silent = true })
+-- map("n", "<Leader>om", "<Plug>(neorg.looking-glass.magnify-code-block)", { noremap = true, silent = true })
+-- map("n", "<Leader>od", "<Plug>(neorg.tempus.insert-date)", { noremap = true, silent = true })
+-- map("n", "<Leader>oi", "<Plug>(neorg.pivot.list.invert)", { noremap = true, silent = true })
+-- map("n", "<Leader>ol", "<Plug>(neorg.pivot.list.toggle)", { noremap = true, silent = true })
+-- map("n", "<Leader>ota", "<Plug>(neorg.qol.todo-items.todo.task-ambiguous)", { noremap = true, silent = true })
+-- map("n", "<Leader>otc", "<Plug>(neorg.qol.todo-items.todo.task-cancelled)", { noremap = true, silent = true })
+-- map("n", "<Leader>otd", "<Plug>(neorg.qol.todo-items.todo.task-done)", { noremap = true, silent = true })
+-- map("n", "<Leader>oth", "<Plug>(neorg.qol.todo-items.todo.task-on-hold)", { noremap = true, silent = true })
+-- map("n", "<Leader>oti", "<Plug>(neorg.qol.todo-items.todo.task-important)", { noremap = true, silent = true })
+-- map("n", "<Leader>otp", "<Plug>(neorg.qol.todo-items.todo.task-pending)", { noremap = true, silent = true })
+-- map("n", "<Leader>otr", "<Plug>(neorg.qol.todo-items.todo.task-recurring)", { noremap = true, silent = true })
+-- map("n", "<Leader>otu", "<Plug>(neorg.qol.todo-items.todo.task-undone)", { noremap = true, silent = true })
+--
+-- map("n", "<leader>op", ':lua require("nabla").popup({border = "single"})<CR>', { desc = "Nabla" })
+-- map("n", "<leader>or", ':lua require("nabla").toggle_virt()<CR>', { desc = "Nabla toggle" })
 
-map("n", "<Leader>oc", "<Plug>(neorg.qol.todo-items.todo.task-cycle)", { noremap = true, silent = true })
-map("n", "<Leader>om", "<Plug>(neorg.looking-glass.magnify-code-block)", { noremap = true, silent = true })
-map("n", "<Leader>od", "<Plug>(neorg.tempus.insert-date)", { noremap = true, silent = true })
-map("n", "<Leader>oi", "<Plug>(neorg.pivot.list.invert)", { noremap = true, silent = true })
-map("n", "<Leader>ol", "<Plug>(neorg.pivot.list.toggle)", { noremap = true, silent = true })
-map("n", "<Leader>ota", "<Plug>(neorg.qol.todo-items.todo.task-ambiguous)", { noremap = true, silent = true })
-map("n", "<Leader>otc", "<Plug>(neorg.qol.todo-items.todo.task-cancelled)", { noremap = true, silent = true })
-map("n", "<Leader>otd", "<Plug>(neorg.qol.todo-items.todo.task-done)", { noremap = true, silent = true })
-map("n", "<Leader>oth", "<Plug>(neorg.qol.todo-items.todo.task-on-hold)", { noremap = true, silent = true })
-map("n", "<Leader>oti", "<Plug>(neorg.qol.todo-items.todo.task-important)", { noremap = true, silent = true })
-map("n", "<Leader>otp", "<Plug>(neorg.qol.todo-items.todo.task-pending)", { noremap = true, silent = true })
-map("n", "<Leader>otr", "<Plug>(neorg.qol.todo-items.todo.task-recurring)", { noremap = true, silent = true })
-map("n", "<Leader>otu", "<Plug>(neorg.qol.todo-items.todo.task-undone)", { noremap = true, silent = true })
 
-map("n", "<leader>op", ':lua require("nabla").popup({border = "single"})<CR>', { desc = "Nabla" })
-map("n", "<leader>or", ':lua require("nabla").toggle_virt()<CR>', { desc = "Nabla toggle" })
+map("n", "<Leader>oo", ":Neorg index<CR>", { noremap = true, silent = true, desc = "Open Neorg index" })
+map("n", "<Leader>oc", "<Plug>(neorg.qol.todo-items.todo.task-cycle)", { noremap = true, silent = true, desc = "Cycle todo state" })
+map("n", "<Leader>om", "<Plug>(neorg.looking-glass.magnify-code-block)", { noremap = true, silent = true, desc = "Magnify code block" })
+map("n", "<Leader>od", "<Plug>(neorg.tempus.insert-date)", { noremap = true, silent = true, desc = "Insert current date" })
+map("n", "<Leader>oi", "<Plug>(neorg.pivot.list.invert)", { noremap = true, silent = true, desc = "Invert list order" })
+map("n", "<Leader>ol", "<Plug>(neorg.pivot.list.toggle)", { noremap = true, silent = true, desc = "Toggle list type" })
+map("n", "<Leader>ota", "<Plug>(neorg.qol.todo-items.todo.task-ambiguous)", { noremap = true, silent = true, desc = "Mark task as ambiguous" })
+map("n", "<Leader>otc", "<Plug>(neorg.qol.todo-items.todo.task-cancelled)", { noremap = true, silent = true, desc = "Mark task as cancelled" })
+map("n", "<Leader>otd", "<Plug>(neorg.qol.todo-items.todo.task-done)", { noremap = true, silent = true, desc = "Mark task as done" })
+map("n", "<Leader>oth", "<Plug>(neorg.qol.todo-items.todo.task-on-hold)", { noremap = true, silent = true, desc = "Mark task as on hold" })
+map("n", "<Leader>oti", "<Plug>(neorg.qol.todo-items.todo.task-important)", { noremap = true, silent = true, desc = "Mark task as important" })
+map("n", "<Leader>otp", "<Plug>(neorg.qol.todo-items.todo.task-pending)", { noremap = true, silent = true, desc = "Mark task as pending" })
+map("n", "<Leader>otr", "<Plug>(neorg.qol.todo-items.todo.task-recurring)", { noremap = true, silent = true, desc = "Mark task as recurring" })
+map("n", "<Leader>otu", "<Plug>(neorg.qol.todo-items.todo.task-undone)", { noremap = true, silent = true, desc = "Mark task as undone" })
+map("n", "<Leader>op", function() require("nabla").popup({ border = "single" }) end, { desc = "Show Nabla popup" })
+map("n", "<Leader>or", function() require("nabla").toggle_virt() end, { desc = "Toggle Nabla virtual text" })
+
+
 
 -- Easy Align -----------------------------------------------------------------
 
@@ -417,27 +443,55 @@ Phonon.venvKeys = {
 	{ "<leader>nv", "<cmd>VenvSelect<cr>", desc = "Choose Python variant" },
 }
 
+-- LSP -----------------------------------------------------------------------
 
-local function zig_term_in_buffer_dir(cmd)
-  local dir = vim.fn.expand('%:p:h')
-  -- Wir öffnen ein Terminal-Split, wechseln ins Verzeichnis und führen das Kommando aus:
-  vim.cmd('split | terminal bash -c "cd ' .. dir .. ' && ' .. cmd .. '; exec bash"')
+
+function Phonon.lsp_on_attach(bufnr)
+  local map = vim.keymap.set
+  local opts = { buffer = bufnr, silent = true }
+
+  map("n", "gR", "<cmd>Telescope lsp_references<CR>", { desc = "Show LSP references", buffer = bufnr })
+  map("n", "gD", vim.lsp.buf.declaration, { desc = "Go to declaration", buffer = bufnr })
+  map("n", "gd", "<cmd>Telescope lsp_definitions<CR>", { desc = "Show definitions", buffer = bufnr })
+  map("n", "gi", "<cmd>Telescope lsp_implementations<CR>", { desc = "Show implementations", buffer = bufnr })
+  map("n", "gt", "<cmd>Telescope lsp_type_definitions<CR>", { desc = "Show type definitions", buffer = bufnr })
+  map({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, { desc = "Code actions", buffer = bufnr })
+  map("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename", buffer = bufnr })
+  map("n", "<leader>D", "<cmd>Telescope diagnostics bufnr=0<CR>", { desc = "Buffer diagnostics", buffer = bufnr })
+  map("n", "<leader>d", vim.diagnostic.open_float, { desc = "Line diagnostics", buffer = bufnr })
+  map("n", "[d", function() vim.diagnostic.jump({ count = -1 }) end, { desc = "Previous diagnostic", buffer = bufnr })
+  map("n", "]d", function() vim.diagnostic.jump({ count = 1 }) end, { desc = "Next diagnostic", buffer = bufnr })
+  map("n", "K", vim.lsp.buf.hover, { desc = "Hover doc", buffer = bufnr })
+  map("n", "<leader>rs", ":LspRestart<CR>", { desc = "Restart LSP", buffer = bufnr })
 end
 
-vim.api.nvim_create_user_command('Zb', function()
-  zig_term_in_buffer_dir('zig build')
-end, {})
+-- Harpoon ---------------------------------------------------------------------------
 
-vim.api.nvim_create_user_command('Zbr', function()
-  zig_term_in_buffer_dir('zig build run')
-end, {})
+-- table.insert(Phonon.keygroups, { "<leader>", desc = "Harpoon", icon = "📌" })
+function Phonon.harpoonKeys()
+  local harpoon = Phonon.harpoon
+  local map = vim.keymap.set
 
-vim.api.nvim_create_user_command('Zt', function()
-  zig_term_in_buffer_dir('zig test')
-end, {})
 
-vim.api.nvim_create_user_command('Zr', function()
-  local file = vim.fn.expand('%:t')
-  zig_term_in_buffer_dir('zig run ' .. file)
-end, {})
+  map("n", "<leader>`", function() harpoon:list():add() end, { desc = "Harpoon add file"  })
+  map("n", "<leader>~", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end, { desc = "Harpoon menu" })
+
+  for i = 1, 4 do
+    map("n", "<leader>" .. i, function() harpoon:list():select(i) end, { desc = "Harpoon file " .. i })
+  end
+end
+
+-- KickNvim -----------------------------------------------------------------------------
+
+Phonon.kicknvim_keys = {
+  assemble = "<leader>ka",
+  run = "<leader>kr",
+}
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "kickass",
+  callback = function()
+    table.insert(Phonon.keygroups, { "<leader>k", desc = "KickAss", icon = "🕹️" })
+  end,
+})
 
